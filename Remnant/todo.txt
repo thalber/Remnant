@@ -1,0 +1,28 @@
+﻿+base ability lifecycle (improve triggering)
++visuals (bubble container problems)
++throwforce and damage?(extra indication: hit-stop and bang)
++deflect
++unhooking
+?waterbounce(crude but origo seems same)
++ac/deac sounds
++soft fade? replaced with flicker
++em: infinite rolls and slides
++import art 
+?testing
++cycle limit?
++one sitting option
++face sprites (make a new set? mildly tedious)
++arena compat (and icons)
+-stat screen
+-fix neuronlight pos
+
+Lizards:
+	+register breed template changes
+	+replace lizgraph cosmetics init
+	+enlarge tail pieces
+	+golden spit
+
+Centipedes:
+	+Coloring (what the fuck is an hsl)
+	+dangles
+	slightly slower
