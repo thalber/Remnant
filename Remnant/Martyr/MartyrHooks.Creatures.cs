@@ -22,10 +22,10 @@ namespace WaspPile.Remnant.Martyr
 {
     public static partial class MartyrHooks
     {
-        internal const float CRIT_GOLDEN_RESIST_MODIFIER = 5f;
-        internal const CreatureTemplate.Type CRIT_CT_GOLDLIZ = CreatureTemplate.Type.RedLizard;
-        internal const CreatureTemplate.Type CRIT_CT_GOLDCENTI = CreatureTemplate.Type.RedCentipede;
-        internal const CreatureTemplate.Type CRIT_CT_GOLDSPITTER = CreatureTemplate.Type.SpitterSpider;
+        internal const float                    CRIT_GOLDEN_RESIST_MODIFIER = 5f;
+        internal const CreatureTemplate.Type    CRIT_CT_GOLDLIZ = CreatureTemplate.Type.RedLizard;
+        internal const CreatureTemplate.Type    CRIT_CT_GOLDCENTI = CreatureTemplate.Type.RedCentipede;
+        internal const CreatureTemplate.Type    CRIT_CT_GOLDSPITTER = CreatureTemplate.Type.SpitterSpider;
         internal static bool IsGolden(this Creature c)
             =>
         c.Template.type == CRIT_CT_GOLDCENTI || c.Template.type == CRIT_CT_GOLDLIZ || c.Template.type == CRIT_CT_GOLDSPITTER;

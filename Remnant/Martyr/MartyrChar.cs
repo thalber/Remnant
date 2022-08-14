@@ -17,20 +17,20 @@ namespace WaspPile.Remnant.Martyr
 {
     public class MartyrChar : SlugBaseCharacter
     {
-        public const string CHARNAME = "Martyr";
-        public const string PERMADEATHKEY = "DISRUPT";
-        public const string ALLEVKEY = "REMEDY";
-        public const string LIFETIMEKEY = "TOTALLT";
-        public const string LTCUREKEY = "BONUSLT";
-        public const string LTSWITCHKEY = "BLTACTIVE";
-        public const string STARTROOM = "SB_MARTYR1";
+        public const string CPROP_CHARNAME = "Martyr";
+        public const string CPROP_STARTROOM = "SB_MARTYR1";
+        public const string KEY_PERMADEATH = "DISRUPT";
+        public const string KEY_ALLEVIATE = "REMEDY";
+        public const string KEY_LIFETIME = "TOTALLT";
+        public const string KEY_LTCURE = "BONUSLT";
+        public const string KEY_LTSWITCH = "BLTACTIVE";
         public static readonly Color baseBodyCol = HSL2RGB(0.583f, 0.3583f, 0.225f);
         public static readonly Color deplBodyCol = HSL2RGB(0.5835f, 0.15f, 0.6f);
         public static readonly Color baseEyeCol = HSL2RGB(0.125f, 0.979f, 0.795f);
         public static readonly Color deplEyeCol = new(0.7f, 0f, 0f);
         public static readonly Color echoGold = HSL2RGB(0.13f, 1, 0.63f);
 
-        public MartyrChar() : base(CHARNAME, FormatVersion.V1, 2, false)
+        public MartyrChar() : base(CPROP_CHARNAME, FormatVersion.V1, 2, false)
         {
             //__ME = new WeakReference(this);
             ME = new(this);
@@ -82,7 +82,7 @@ namespace WaspPile.Remnant.Martyr
         public override bool CanEatMeat(Player player, Creature creature) => creature is Centipede || creature is not IPlayerEdible;
         public override bool QuarterFood => true;
         public override string DisplayName => RemnantPlugin.DoTrolling ? "Martyr" : "The Martyr";
-        public override string StartRoom => STARTROOM;
+        public override string StartRoom => CPROP_STARTROOM;
         #endregion chardetails
         #region hooks lc
         protected override void Disable()
@@ -137,8 +137,8 @@ namespace WaspPile.Remnant.Martyr
         public override Stream GetResource(params string[] path) => GetRes(path) ?? base.GetResource();
         public override SelectMenuAccessibility GetSelectMenuState(SlugcatSelectMenu menu)
         {
-            var meta = CurrentMiscSaveData(CHARNAME);
-            if (meta.TryGetValue(PERMADEATHKEY, out _))
+            var meta = CurrentMiscSaveData(CPROP_CHARNAME);
+            if (meta.TryGetValue(KEY_PERMADEATH, out _))
             {
                 return SelectMenuAccessibility.MustRestart;
             }
@@ -157,15 +157,15 @@ namespace WaspPile.Remnant.Martyr
                 ss.deathPersistentSaveData.theMark = true;
                 ss.theGlow = true;
             }
-            CurrentMiscSaveData(CHARNAME).TryRemoveKey(PERMADEATHKEY);
+            CurrentMiscSaveData(CPROP_CHARNAME).TryRemoveKey(KEY_PERMADEATH);
 
         }
         public static bool MartyrIsDead(int saveslot)
         {
             try
             {
-                var meta = SaveManager.GetCharacterData(CHARNAME, saveslot);
-                return meta.ContainsKey(PERMADEATHKEY) & RemnantConfig.noQuits.Value;
+                var meta = SaveManager.GetCharacterData(CPROP_CHARNAME, saveslot);
+                return meta.ContainsKey(KEY_PERMADEATH) & RemnantConfig.noQuits.Value;
             }
             catch { return false; }
         }
@@ -203,9 +203,9 @@ namespace WaspPile.Remnant.Martyr
                 base.Save(data);
                 if (RemainingCycles < 0)
                 {
-                    var meta = CurrentMiscSaveData(CHARNAME);
+                    var meta = CurrentMiscSaveData(CPROP_CHARNAME);
                     var deathmark = "VESSEL EXPIRATION";
-                    meta.SetKey(PERMADEATHKEY, deathmark);
+                    meta.SetKey(KEY_PERMADEATH, deathmark);
                     CRW.processManager.RequestMainProcessSwitch(ProcessManager.ProcessID.Statistics);
                     Log($"REMNANT DISRUPTED: {deathmark}");
                 }
@@ -222,22 +222,22 @@ namespace WaspPile.Remnant.Martyr
                 }
                 if (cureApplied)
                 {
-                    data.SetKey(LTSWITCHKEY, "1");
+                    data.SetKey(KEY_LTSWITCH, "1");
                 }
-                data.SetKey(LIFETIMEKEY, cycleLimit.ToString());
-                data.SetKey(LTCUREKEY, cycleCure.ToString());
+                data.SetKey(KEY_LIFETIME, cycleLimit.ToString());
+                data.SetKey(KEY_LTCURE, cycleCure.ToString());
 
                 if (RemnantConfig.noQuits.Value && asQuit && cycleNumber != 0 || imDone)
                 {
-                    var meta = CurrentMiscSaveData(CHARNAME);
+                    var meta = CurrentMiscSaveData(CPROP_CHARNAME);
                     var deathmark = "ACTOR DESYNC";
-                    meta.SetKey(PERMADEATHKEY, deathmark);
+                    meta.SetKey(KEY_PERMADEATH, deathmark);
                     var cpm = CRW.processManager;
                     if (cpm.upcomingProcess != null) cpm.RequestMainProcessSwitch(ProcessManager.ProcessID.SlugcatSelect);
                     Log($"REMNANT DISRUPTED: {deathmark}");
                 }
-                if (RemedyCache && !asDeath) { data.SetKey(ALLEVKEY, "ON"); LogWarning("REMEDY RETAINED"); }
-                else { data.SetKey(ALLEVKEY, "OFF"); LogWarning("SAVED AS DEATH, REMEDY REMOVED"); }
+                if (RemedyCache && !asDeath) { data.SetKey(KEY_ALLEVIATE, "ON"); LogWarning("REMEDY RETAINED"); }
+                else { data.SetKey(KEY_ALLEVIATE, "OFF"); LogWarning("SAVED AS DEATH, REMEDY REMOVED"); }
                 //else if (RemedyCache) data.SetKey(ALLEVKEY, "UNSPECIFIED");
                 base.SavePermanent(data, asDeath, asQuit);
             }
@@ -245,10 +245,10 @@ namespace WaspPile.Remnant.Martyr
             {
                 MartyrHooks.FieldCleanup();
                 //RemedyCache = data[ALLEVKEY] == "ON";
-                if (data.TryGetValue(LIFETIMEKEY, out var rawlt) && int.TryParse(rawlt, out var ltin)) cycleLimit = ltin;
-                if (data.TryGetValue(LTCUREKEY, out var rawcr) && int.TryParse(rawcr, out var crin)) cycleCure = crin;
-                data.TryGetValue(ALLEVKEY, out var res);
-                data.TryGetValue(LTSWITCHKEY, out var o); cureApplied = o is not null;
+                if (data.TryGetValue(KEY_LIFETIME, out var rawlt) && int.TryParse(rawlt, out var ltin)) cycleLimit = ltin;
+                if (data.TryGetValue(KEY_LTCURE, out var rawcr) && int.TryParse(rawcr, out var crin)) cycleCure = crin;
+                data.TryGetValue(KEY_ALLEVIATE, out var res);
+                data.TryGetValue(KEY_LTSWITCH, out var o); cureApplied = o is not null;
                 RemedyCache = res == "ON";
                 //if (RemnantPlugin.DebugMode) LogWarning("LOADPERM RUN");
                 base.LoadPermanent(data);
